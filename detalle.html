@@ -1,0 +1,85 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1769d2">
+  <title>Detalles de la novela | Novelas Ligeras</title>
+
+  <link rel="stylesheet" href="estilos_detalle.css">
+  <script src="js_detalle.js" defer></script>
+</head>
+
+<body>
+
+  <header class="cabecera-detalle">
+    <a href="index.html" class="logo-detalle">
+      <span class="logo-icono">NL</span>
+      <span>Novelas <strong>Ligeras</strong></span>
+    </a>
+
+    <a href="index.html" class="volver">← Volver al catálogo</a>
+  </header>
+
+  <main class="detalle-principal">
+
+    <a href="index.html" class="migas">Inicio / Catálogo / <span id="miga-titulo">Novela</span></a>
+
+    <section class="ficha-novela">
+
+      <div class="portada-contenedor">
+        <img id="portada" src="" alt="Portada de la novela">
+      </div>
+
+      <div class="informacion-novela">
+        <span class="etiqueta">FICHA DE NOVELA</span>
+
+        <h1 id="titulo">Cargando novela...</h1>
+
+        <div class="metadatos">
+          <span id="valoracion">★ Sin valoración</span>
+          <span id="generos">Sin género</span>
+        </div>
+
+        <h2>Sinopsis</h2>
+        <p id="descripcion">Cargando descripción...</p>
+
+        <a href="#volumenes" class="boton-volumenes">
+          Explorar volúmenes ↓
+        </a>
+      </div>
+
+    </section>
+
+    <section class="seccion-volumenes" id="volumenes">
+      <div class="encabezado-seccion">
+        <div>
+          <span class="icono-seccion">▤</span>
+          <h2>Volúmenes</h2>
+        </div>
+        <span class="contador" id="contador-volumenes">3 volúmenes</span>
+      </div>
+
+      <p class="aviso-volumenes">
+        Los volúmenes mostrados son ejemplos ficticios de diseño.
+        No representan publicaciones reales.
+      </p>
+
+      <div id="lista-volumenes" class="lista-volumenes"></div>
+    </section>
+
+    <p id="mensaje-error" class="mensaje-error" hidden>
+      No se pudo encontrar esta novela.
+      <a href="index.html">Volver al catálogo</a>
+    </p>
+
+  </main>
+
+  <footer class="footer-detalle">
+    <p>© 2026 Novelas Ligeras · Historias que te acompañan.</p>
+    <a href="index.html">Volver al inicio ↑</a>
+  </footer>
+
+</body>
+</html>
