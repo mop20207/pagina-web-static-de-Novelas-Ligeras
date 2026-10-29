@@ -362,3 +362,55 @@ a {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+
+/* =========================================
+   INFORMACIÓN ADICIONAL DE LA NOVELA
+========================================= */
+
+.seccion-informacion {
+  margin-top: 30px;
+}
+
+.datos-novela {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.dato-novela {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 16px;
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  box-shadow: var(--sombra);
+}
+
+.dato-novela span {
+  color: var(--color-suave);
+  font-size: 11px;
+}
+
+.dato-novela strong {
+  color: var(--color-texto);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 650px) {
+  .datos-novela {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .datos-novela {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+
