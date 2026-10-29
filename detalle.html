@@ -1,10 +1,12 @@
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#1769d2">
+
   <title>Detalles de la novela | Novelas Ligeras</title>
 
   <link rel="stylesheet" href="estilos_detalle.css">
@@ -13,19 +15,30 @@
 
 <body>
 
+  <!-- CABECERA -->
   <header class="cabecera-detalle">
+
     <a href="index.html" class="logo-detalle">
       <span class="logo-icono">NL</span>
       <span>Novelas <strong>Ligeras</strong></span>
     </a>
 
-    <a href="index.html" class="volver">← Volver al catálogo</a>
+    <a href="index.html" class="volver">
+      ← Volver al catálogo
+    </a>
+
   </header>
 
+
+  <!-- CONTENIDO PRINCIPAL -->
   <main class="detalle-principal">
 
-    <a href="index.html" class="migas">Inicio / Catálogo / <span id="miga-titulo">Novela</span></a>
+    <a href="index.html" class="migas">
+      Inicio / Catálogo / <span id="miga-titulo">Novela</span>
+    </a>
 
+
+    <!-- FICHA PRINCIPAL -->
     <section class="ficha-novela">
 
       <div class="portada-contenedor">
@@ -33,32 +46,112 @@
       </div>
 
       <div class="informacion-novela">
+
         <span class="etiqueta">FICHA DE NOVELA</span>
 
         <h1 id="titulo">Cargando novela...</h1>
 
         <div class="metadatos">
+
           <span id="valoracion">★ Sin valoración</span>
+
           <span id="generos">Sin género</span>
+
         </div>
 
         <h2>Sinopsis</h2>
-        <p id="descripcion">Cargando descripción...</p>
 
-        <a href="#volumenes" class="boton-volumenes">
-          Explorar volúmenes ↓
+        <p id="descripcion">
+          Cargando descripción...
+        </p>
+
+        <a href="#informacion-adicional" class="boton-volumenes">
+          Más información ↓
         </a>
+
       </div>
 
     </section>
 
-    <section class="seccion-volumenes" id="volumenes">
+
+    <!-- INFORMACIÓN ADICIONAL -->
+    <section class="seccion-informacion" id="informacion-adicional">
+
       <div class="encabezado-seccion">
+
+        <div>
+          <span class="icono-seccion">▤</span>
+          <h2>Información de la novela</h2>
+        </div>
+
+      </div>
+
+      <div class="datos-novela">
+
+        <div class="dato-novela">
+          <span>Autor</span>
+          <strong id="autor">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Ilustrador</span>
+          <strong id="ilustrador">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Título original</span>
+          <strong id="titulo-original">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Fecha de lanzamiento</span>
+          <strong id="fecha-lanzamiento">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Editorial original</span>
+          <strong id="editorial">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Tipo</span>
+          <strong id="tipo">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Idioma original</span>
+          <strong id="idioma">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>País de origen</span>
+          <strong id="pais">No disponible</strong>
+        </div>
+
+        <div class="dato-novela">
+          <span>Estado</span>
+          <strong id="estado">No disponible</strong>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- VOLÚMENES FICTICIOS -->
+    <section class="seccion-volumenes" id="volumenes">
+
+      <div class="encabezado-seccion">
+
         <div>
           <span class="icono-seccion">▤</span>
           <h2>Volúmenes</h2>
         </div>
-        <span class="contador" id="contador-volumenes">3 volúmenes</span>
+
+        <span class="contador" id="contador-volumenes">
+          3 volúmenes
+        </span>
+
       </div>
 
       <p class="aviso-volumenes">
@@ -67,18 +160,33 @@
       </p>
 
       <div id="lista-volumenes" class="lista-volumenes"></div>
+
     </section>
 
+
+    <!-- MENSAJE DE ERROR -->
     <p id="mensaje-error" class="mensaje-error" hidden>
+
       No se pudo encontrar esta novela.
+
       <a href="index.html">Volver al catálogo</a>
+
     </p>
 
   </main>
 
+
+  <!-- PIE DE PÁGINA -->
   <footer class="footer-detalle">
-    <p>© 2026 Novelas Ligeras · Historias que te acompañan.</p>
-    <a href="index.html">Volver al inicio ↑</a>
+
+    <p>
+      © 2026 Novelas Ligeras · Historias que te acompañan.
+    </p>
+
+    <a href="index.html">
+      Volver al inicio ↑
+    </a>
+
   </footer>
 
 </body>
