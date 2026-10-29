@@ -1,0 +1,901 @@
+
+/* =========================================
+   1. VARIABLES DEL DISEÑO
+========================================= */
+
+:root {
+  --color-principal: #1769d2;
+  --color-principal-hover: #0e54b4;
+  --color-secundario: #65b5ff;
+  --color-fondo: #f5f9ff;
+  --color-superficie: #ffffff;
+  --color-texto: #193454;
+  --color-texto-suave: #71849e;
+  --color-borde: #e2ecf8;
+  --color-footer: #10396d;
+  --color-destacado: #eaf3ff;
+
+  --sombra: 0 5px 18px rgba(32, 83, 143, 0.07);
+  --radio: 12px;
+  --ancho-maximo: 1440px;
+}
+
+
+/* =========================================
+   2. REINICIO Y BASE
+========================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 90px;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+
+/* =========================================
+   3. CABECERA Y NAVEGACIÓN
+========================================= */
+
+.cabecera {
+  background: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+  box-shadow: 0 2px 12px rgba(30, 75, 130, 0.04);
+}
+
+.barra-navegacion {
+  width: min(100% - 48px, var(--ancho-maximo));
+  min-height: 76px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.logo-icono {
+  width: 43px;
+  height: 43px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--color-principal);
+  color: white;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -1px;
+}
+
+.logo-texto {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.logo-texto strong {
+  font-size: 19px;
+  letter-spacing: -0.6px;
+}
+
+.logo-texto strong span {
+  color: var(--color-principal);
+}
+
+.logo-texto small {
+  font-size: 11px;
+  color: var(--color-texto-suave);
+}
+
+.menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.menu a {
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: var(--color-texto-suave);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s, color 0.2s;
+}
+
+.menu a:hover,
+.menu a.activo {
+  color: var(--color-principal);
+  background: var(--color-destacado);
+}
+
+.boton-biblioteca {
+  padding: 11px 16px;
+  background: var(--color-principal);
+  color: white;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.boton-biblioteca:hover {
+  background: var(--color-principal-hover);
+}
+
+
+/* =========================================
+   4. DISTRIBUCIÓN PRINCIPAL
+========================================= */
+
+.pagina {
+  width: min(100% - 48px, var(--ancho-maximo));
+  margin: 25px auto 38px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 285px;
+  gap: 22px;
+  align-items: start;
+}
+
+.contenido-principal {
+  min-width: 0;
+}
+
+
+/* =========================================
+   5. BANNER PRINCIPAL
+========================================= */
+
+.banner {
+  position: relative;
+  min-height: 230px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 32px;
+  border-radius: var(--radio);
+  background:
+    radial-gradient(ellipse at 85% 15%, #6ab8ff 0%, transparent 38%),
+    linear-gradient(115deg, #104a91, #1976d2 62%, #65b5ff);
+  color: white;
+  isolation: isolate;
+}
+
+.banner::before {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -55px;
+  bottom: -150px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 25px rgba(255, 255, 255, 0.04),
+    0 0 0 55px rgba(255, 255, 255, 0.04);
+  z-index: -1;
+}
+
+.banner-contenido {
+  max-width: 530px;
+  position: relative;
+  z-index: 1;
+}
+
+.etiqueta {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: #c6e5ff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.banner h1 {
+  max-width: 470px;
+  margin-bottom: 12px;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.13;
+  letter-spacing: -1px;
+}
+
+.banner p {
+  max-width: 440px;
+  margin-bottom: 20px;
+  color: #e5f2ff;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.boton-principal {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 17px;
+  border-radius: 8px;
+  background: white;
+  color: var(--color-principal);
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.boton-principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.13);
+}
+
+.banner-decoracion {
+  position: absolute;
+  right: 8%;
+  bottom: 20px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 25px;
+  pointer-events: none;
+}
+
+.banner-decoracion span:nth-child(1) {
+  position: absolute;
+  right: 90px;
+  bottom: 60px;
+  font-size: 35px;
+}
+
+.banner-decoracion span:nth-child(2) {
+  position: absolute;
+  right: 20px;
+  bottom: 110px;
+  font-size: 45px;
+}
+
+.banner-decoracion span:nth-child(3) {
+  position: absolute;
+  right: 150px;
+  bottom: 125px;
+  font-size: 22px;
+}
+
+
+/* =========================================
+   6. SECCIONES DE NOVELAS
+========================================= */
+
+.seccion {
+  margin-top: 28px;
+  min-width: 0;
+}
+
+.seccion-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.seccion-cabecera > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.seccion-icono {
+  color: var(--color-principal);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.seccion h2 {
+  font-size: 19px;
+  line-height: 1.3;
+  letter-spacing: -0.4px;
+}
+
+.ver-todas {
+  color: var(--color-principal);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ver-todas:hover {
+  color: var(--color-principal-hover);
+  text-decoration: underline;
+}
+
+
+/* =========================================
+   7. CONTENEDORES Y TARJETAS
+========================================= */
+
+.contenedor,
+.contenedor-secundario {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  min-width: 0;
+}
+
+.contenedor:empty::before {
+  content: "Cargando novelas...";
+  grid-column: 1 / -1;
+  padding: 28px;
+  text-align: center;
+  color: var(--color-texto-suave);
+  background: var(--color-superficie);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+}
+
+.novela-wrapper,
+.tarjeta-demo {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  padding: 10px;
+  overflow: hidden;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  background: var(--color-superficie);
+  box-shadow: var(--sombra);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.novela-wrapper:hover,
+.tarjeta-demo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 22px rgba(32, 83, 143, 0.12);
+}
+
+.novela {
+  min-width: 0;
+}
+
+.novela h3,
+.tarjeta-demo h3 {
+  margin: 9px 0 5px;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--color-texto);
+}
+
+.novela img {
+  width: 100%;
+  height: 145px;
+  object-fit: cover;
+  border-radius: 7px;
+  background: var(--color-destacado);
+}
+
+.novela .lore {
+  display: -webkit-box;
+  margin: 6px 0;
+  overflow: hidden;
+  color: var(--color-texto-suave);
+  font-size: 11px;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.valor-genero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 7px;
+}
+
+.novela .genero {
+  color: var(--color-texto-suave);
+  font-size: 10px;
+}
+
+.novela .valoracion {
+  color: #d58b08;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+
+/* Tarjetas provisionales de demostración */
+
+.tarjeta-demo {
+  padding: 10px;
+}
+
+.tarjeta-demo > p {
+  color: var(--color-texto-suave);
+  font-size: 11px;
+}
+
+.portada-demo {
+  min-height: 120px;
+  display: grid;
+  place-items: center;
+  border-radius: 7px;
+  color: white;
+  font-size: 38px;
+  font-weight: 800;
+  background: linear-gradient(145deg, #65b5ff, #1769d2);
+}
+
+.portada-dos {
+  background: linear-gradient(145deg, #b4d8ff, #527fc5);
+}
+
+.portada-tres {
+  background: linear-gradient(145deg, #5c83bf, #1a3769);
+}
+
+.portada-cuatro {
+  background: linear-gradient(145deg, #8bd5e9, #426db1);
+}
+
+
+/* =========================================
+   8. BARRA LATERAL
+========================================= */
+
+.barra-lateral {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.panel-busqueda,
+.panel-categorias,
+.panel-biblioteca {
+  padding: 19px;
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra);
+}
+
+.barra-lateral h2 {
+  margin-bottom: 14px;
+  font-size: 16px;
+  letter-spacing: -0.3px;
+}
+
+.form-busqueda {
+  display: flex;
+  gap: 6px;
+}
+
+.form-busqueda input {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 10px;
+  border: 1px solid var(--color-borde);
+  border-radius: 7px;
+  outline: none;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  font-size: 11px;
+}
+
+.form-busqueda input:focus {
+  border-color: var(--color-principal);
+  box-shadow: 0 0 0 3px rgba(23, 105, 210, 0.1);
+}
+
+.form-busqueda button {
+  flex-shrink: 0;
+  width: 38px;
+  border: none;
+  border-radius: 7px;
+  background: var(--color-principal);
+  color: white;
+  font-size: 21px;
+  transition: background 0.2s;
+}
+
+.form-busqueda button:hover {
+  background: var(--color-principal-hover);
+}
+
+.texto-ayuda {
+  margin-top: 8px;
+  color: var(--color-texto-suave);
+  font-size: 10px;
+}
+
+.panel-categorias h2 span {
+  margin-right: 5px;
+  color: var(--color-principal);
+}
+
+.lista-categorias {
+  list-style: none;
+}
+
+.lista-categorias li + li {
+  margin-top: 3px;
+}
+
+.lista-categorias a {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 7px;
+  border-radius: 7px;
+  color: var(--color-texto);
+  font-size: 12px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.lista-categorias a:hover {
+  color: var(--color-principal);
+  background: var(--color-destacado);
+}
+
+.lista-categorias a > span {
+  flex: 1;
+}
+
+.lista-categorias small {
+  padding: 3px 7px;
+  border-radius: 5px;
+  background: var(--color-destacado);
+  color: var(--color-principal);
+  font-size: 10px;
+}
+
+.panel-biblioteca {
+  background: linear-gradient(145deg, var(--color-superficie), var(--color-destacado));
+}
+
+.biblioteca-icono {
+  display: block;
+  margin-bottom: 9px;
+  font-size: 26px;
+}
+
+.panel-biblioteca h2 {
+  margin-bottom: 8px;
+}
+
+.panel-biblioteca p {
+  margin-bottom: 12px;
+  color: var(--color-texto-suave);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.panel-biblioteca a {
+  color: var(--color-principal);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =========================================
+   9. PIE DE PÁGINA
+========================================= */
+
+.footer {
+  padding: 34px 24px 0;
+  background: var(--color-footer);
+  color: #eaf3ff;
+}
+
+.footer-contenido,
+.footer-inferior {
+  width: min(100%, var(--ancho-maximo));
+  margin: auto;
+}
+
+.footer-contenido {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.4fr;
+  gap: 25px;
+  padding-bottom: 27px;
+}
+
+.logo-footer .logo-icono {
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+}
+
+.logo-footer .logo-texto strong {
+  font-size: 17px;
+}
+
+.logo-footer .logo-texto strong span {
+  color: #83c5ff;
+}
+
+.logo-footer .logo-texto small {
+  color: #b6d2f0;
+}
+
+.footer-columna {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.footer-columna h3 {
+  margin-bottom: 3px;
+  font-size: 13px;
+}
+
+.footer-columna a {
+  color: #c3d8ef;
+  font-size: 11px;
+}
+
+.footer-columna a:hover,
+.footer-inferior a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.footer-mensaje {
+  align-self: center;
+  text-align: right;
+}
+
+.footer-mensaje p {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.footer-mensaje span {
+  color: #b6d2f0;
+  font-size: 12px;
+}
+
+.footer-inferior {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  color: #b6d2f0;
+  font-size: 10px;
+}
+
+.footer-inferior > div {
+  display: flex;
+  gap: 16px;
+}
+
+
+/* =========================================
+   10. TABLET
+========================================= */
+
+@media (max-width: 1000px) {
+  .barra-navegacion {
+    gap: 14px;
+  }
+
+  .menu {
+    gap: 2px;
+  }
+
+  .menu a {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .pagina {
+    grid-template-columns: minmax(0, 1fr) 245px;
+    gap: 16px;
+  }
+
+  .contenedor,
+  .contenedor-secundario {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .footer-contenido {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+
+/* =========================================
+   11. MÓVILES
+========================================= */
+
+@media (max-width: 700px) {
+  .barra-navegacion {
+    width: min(100% - 28px, var(--ancho-maximo));
+    min-height: auto;
+    padding: 14px 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .logo-texto strong {
+    font-size: 17px;
+  }
+
+  .boton-biblioteca {
+    padding: 9px 11px;
+    font-size: 11px;
+  }
+
+  .menu {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-top: 7px;
+  }
+
+  .menu a {
+    flex-shrink: 0;
+    padding: 9px 11px;
+  }
+
+  .pagina {
+    width: calc(100% - 28px);
+    margin-top: 15px;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .banner {
+    min-height: 240px;
+    padding: 24px 20px;
+  }
+
+  .banner h1 {
+    font-size: 29px;
+  }
+
+  .banner p {
+    max-width: 330px;
+    font-size: 12px;
+  }
+
+  .banner-decoracion {
+    right: -35px;
+    opacity: 0.6;
+  }
+
+  .barra-lateral {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+
+  .panel-biblioteca {
+    grid-column: 1 / -1;
+  }
+
+  .footer {
+    padding: 28px 18px 0;
+  }
+
+  .footer-contenido {
+    gap: 25px 18px;
+  }
+
+  .footer-mensaje {
+    text-align: left;
+  }
+}
+
+
+/* =========================================
+   12. MÓVILES PEQUEÑOS
+========================================= */
+
+@media (max-width: 420px) {
+  .contenedor,
+  .contenedor-secundario {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 9px;
+  }
+
+  .novela-wrapper,
+  .tarjeta-demo {
+    padding: 7px;
+  }
+
+  .novela img {
+    height: 115px;
+  }
+
+  .portada-demo {
+    min-height: 100px;
+  }
+
+  .seccion h2 {
+    font-size: 16px;
+  }
+
+  .seccion-icono {
+    font-size: 20px;
+  }
+
+  .ver-todas {
+    font-size: 10px;
+  }
+
+  .barra-lateral {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .panel-biblioteca {
+    grid-column: auto;
+  }
+
+  .footer-contenido {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .footer-inferior {
+    flex-direction: column;
+    line-height: 1.8;
+  }
+}
+
+
+
+/* Mensaje cuando no se puede cargar el catálogo remoto */
+.mensaje-catalogo-error {
+  grid-column: 1 / -1;
+  padding: 18px;
+  color: var(--color-texto-suave);
+  text-align: center;
+}

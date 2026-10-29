@@ -1,0 +1,279 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1769d2">
+  <meta name="description" content="Descubre y explora novelas ligeras, fantasía, aventura y nuevas historias.">
+
+  <title>Novelas Ligeras | Descubre tu próxima historia</title>
+
+  <link rel="stylesheet" href="estilos_pestaña_principal.css">
+  <script src="js_pestaña_principal.js" defer></script>
+</head>
+
+<body>
+
+  <!-- CABECERA -->
+  <header class="cabecera">
+    <div class="barra-navegacion">
+
+      <a href="#" class="logo">
+        <span class="logo-icono">NL</span>
+        <span class="logo-texto">
+          <strong>Novelas <span>Ligeras</span></strong>
+          <small>Historias que te acompañan</small>
+        </span>
+      </a>
+
+      <nav class="menu">
+        <a href="#inicio" class="activo">Inicio</a>
+        <a href="#categorias">Categorías</a>
+        <a href="#mes">Novelas</a>
+        <a href="#nuevas">Novedades</a>
+      </nav>
+
+      <a href="#biblioteca" class="boton-biblioteca">
+        Mi biblioteca
+      </a>
+
+    </div>
+  </header>
+
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="pagina" id="inicio">
+
+    <div class="contenido-principal">
+
+      <!-- BANNER -->
+      <section class="banner">
+        <div class="banner-contenido">
+          <span class="etiqueta">TU PRÓXIMA AVENTURA COMIENZA AQUÍ</span>
+
+          <h1>Descubre historias que te harán soñar</h1>
+
+          <p>
+            Explora mundos fantásticos, aventuras inolvidables
+            y personajes que te acompañarán en cada capítulo.
+          </p>
+
+          <a href="#mes" class="boton-principal">
+            Explorar novelas <span>→</span>
+          </a>
+        </div>
+
+        <div class="banner-decoracion" aria-hidden="true">
+          <span>✦</span>
+          <span>✧</span>
+          <span>❋</span>
+        </div>
+      </section>
+
+
+      <!-- NOVELAS DEL MES -->
+      <section class="seccion" id="mes">
+
+        <div class="seccion-cabecera">
+          <div>
+            <span class="seccion-icono">♛</span>
+            <h2>Novelas del mes</h2>
+          </div>
+
+          <a href="#mes" class="ver-todas">Ver todas →</a>
+        </div>
+
+        <!-- Aquí cargará las novelas tu JavaScript -->
+        <div class="contenedor">
+          <article class="tarjeta-demo">
+            <div class="portada-demo">✦</div>
+            <h3>Próxima gran aventura</h3>
+            <p>Una historia por descubrir</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo">❋</div>
+            <h3>Mundos fantásticos</h3>
+            <p>Magia y aventuras</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo">✧</div>
+            <h3>Historias inolvidables</h3>
+            <p>Personajes y emociones</p>
+          </article>
+        </div>
+
+      </section>
+
+
+      <!-- MÁS VISTAS -->
+      <section class="seccion" id="vistas">
+
+        <div class="seccion-cabecera">
+          <div>
+            <span class="seccion-icono">◉</span>
+            <h2>Más vistas</h2>
+          </div>
+
+          <a href="#vistas" class="ver-todas">Ver todas →</a>
+        </div>
+
+        <div class="contenedor-secundario">
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-dos">01</div>
+            <h3>Las favoritas</h3>
+            <p>Las más populares</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-tres">02</div>
+            <h3>Grandes aventuras</h3>
+            <p>Acción y fantasía</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-cuatro">03</div>
+            <h3>Otros mundos</h3>
+            <p>Descubre algo nuevo</p>
+          </article>
+        </div>
+
+      </section>
+
+
+      <!-- NOVEDADES -->
+      <section class="seccion" id="nuevas">
+
+        <div class="seccion-cabecera">
+          <div>
+            <span class="seccion-icono">✦</span>
+            <h2>Nuevas novelas</h2>
+          </div>
+
+          <a href="#nuevas" class="ver-todas">Ver todas →</a>
+        </div>
+
+        <div class="contenedor-secundario">
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-tres">✧</div>
+            <h3>Nuevos comienzos</h3>
+            <p>Recién llegadas</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-cuatro">✦</div>
+            <h3>Un mundo por explorar</h3>
+            <p>Fantasía y misterio</p>
+          </article>
+
+          <article class="tarjeta-demo">
+            <div class="portada-demo portada-dos">✺</div>
+            <h3>Historias recientes</h3>
+            <p>Nuevas aventuras</p>
+          </article>
+        </div>
+
+      </section>
+
+    </div>
+
+
+    <!-- BARRA LATERAL -->
+    <aside class="barra-lateral">
+
+      <section class="panel-busqueda">
+        <h2>Buscar novelas</h2>
+
+        <form class="form-busqueda" action="#" role="search">
+          <label for="buscador" class="solo-lectores">
+            Nombre de la novela
+          </label>
+
+          <input
+            type="search"
+            id="buscador"
+            placeholder="Escribe el nombre..."
+          >
+
+          <button type="submit" aria-label="Buscar">⌕</button>
+        </form>
+
+        <p class="texto-ayuda">Encuentra tu próxima lectura.</p>
+      </section>
+
+
+      <section class="panel-categorias" id="categorias">
+        <h2><span>▤</span> Categorías</h2>
+
+        <ul class="lista-categorias">
+          <li><a href="#mes">⚔️ <span>Acción</span><small>32</small></a></li>
+          <li><a href="#mes">➤ <span>Aventura</span><small>28</small></a></li>
+          <li><a href="#mes">☻ <span>Comedia</span><small>21</small></a></li>
+          <li><a href="#mes">♡ <span>Romance</span><small>24</small></a></li>
+          <li><a href="#mes">✧ <span>Fantasía</span><small>35</small></a></li>
+          <li><a href="#mes">☾ <span>Drama</span><small>18</small></a></li>
+          <li><a href="#mes">⌘ <span>Ciencia ficción</span><small>16</small></a></li>
+          <li><a href="#mes">❋ <span>Slice of Life</span><small>12</small></a></li>
+        </ul>
+      </section>
+
+
+      <section class="panel-biblioteca" id="biblioteca">
+        <span class="biblioteca-icono">📚</span>
+        <h2>Tu próxima historia te espera</h2>
+        <p>Explora nuevos mundos y encuentra tu próxima lectura favorita.</p>
+        <a href="#mes">Descubrir novelas →</a>
+      </section>
+
+    </aside>
+
+  </main>
+
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="footer">
+    <div class="footer-contenido">
+
+      <a href="#inicio" class="logo logo-footer">
+        <span class="logo-icono">NL</span>
+        <span class="logo-texto">
+          <strong>Novelas <span>Ligeras</span></strong>
+          <small>Historias que te acompañan</small>
+        </span>
+      </a>
+
+      <div class="footer-columna">
+        <h3>Explorar</h3>
+        <a href="#inicio">Inicio</a>
+        <a href="#categorias">Categorías</a>
+        <a href="#mes">Novelas</a>
+      </div>
+
+      <div class="footer-columna">
+        <h3>Comunidad</h3>
+        <a href="#biblioteca">Mi biblioteca</a>
+        <a href="#nuevas">Novedades</a>
+        <a href="mailto:contacto@ejemplo.com">Contacto</a>
+      </div>
+
+      <div class="footer-mensaje">
+        <p>Cada historia es una puerta a otro mundo.</p>
+        <span>Encuentra la tuya.</span>
+      </div>
+
+    </div>
+
+    <div class="footer-inferior">
+      <p>© 2026 Novelas Ligeras. Todos los derechos reservados.</p>
+      <div>
+        <a href="#privacidad">Privacidad</a>
+        <a href="#terminos">Términos</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
+
