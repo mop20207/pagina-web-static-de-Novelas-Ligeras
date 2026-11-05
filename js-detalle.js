@@ -18,7 +18,8 @@ const VOLUMENES_EXTRA = {
         "archivo": "consultando-demonio-enmascarado.json",
         "titulo": "Consultando a este ¡Demonio Enmascarado!",
         "numero": 1,
-        "despuesDe": 8
+        "despuesDe": 8,
+        "imagen": "https://meguminexplosionblog.wordpress.com/wp-content/uploads/2017/10/konosubaspin.jpg"
     },
     {
         "slug": "vanir-extras",
@@ -32,7 +33,8 @@ const VOLUMENES_EXTRA = {
         "archivo": "grupo-ladrones-megumin.json",
         "titulo": "El Grupo de Ladrones de Megumin",
         "numero": 3,
-        "despuesDe": 10
+        "despuesDe": 10,
+        "imagen": "https://meguminexplosionblog.wordpress.com/wp-content/uploads/2017/11/portada1.jpg"
     }
 ]
 };
@@ -356,6 +358,14 @@ async function cargarVolumenes(id) {
                 const extra = entrada.datos;
                 tarjeta.href = "muestra-contenido.html?novela=" + encodeURIComponent(id) +
                     "&extra=" + encodeURIComponent(extra.slug);
+                if (extra.imagen) {
+                    const imagen = document.createElement("img");
+                    imagen.className = "imagen-volumen";
+                    imagen.src = extra.imagen;
+                    imagen.alt = "Portada de " + extra.titulo;
+                    imagen.loading = "lazy";
+                    tarjeta.append(imagen);
+                }
                 const numero = document.createElement("span");
                 numero.className = "volumen-numero";
                 numero.textContent = "Vol. Extra " + extra.numero;
