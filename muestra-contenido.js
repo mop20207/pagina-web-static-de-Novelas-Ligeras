@@ -42,7 +42,7 @@ function agregarBloque(items, tipo, clave, titulo, bloque, imagenes = []) {
 function construirIndice(v) {
     const items=[];
     agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,
-        [...(v.prologo_imagenes||[]),...(v.imagenes_prologo||[])]);
+        [...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)]);
     for (const [ck,c] of Object.entries(v.capitulos||{})) {
         if (!c || typeof c!=="object") continue;
         const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])];
