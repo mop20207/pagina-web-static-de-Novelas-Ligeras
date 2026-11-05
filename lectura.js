@@ -10,7 +10,9 @@ function obtenerVolumen(json,numero){
  if("capitulos"in json||"titulo"in json||"prologo"in json)return json;
  return Object.values(json).find(x=>x&&typeof x==="object"&&("capitulos"in x||"titulo"in x||"prologo"in x))||null;
 }
-function textoValido(x){return typeof x==="string"&&x.trim().length>0;}\nfunction imagenesArray(x){return Array.isArray(x)?x:[];}\nfunction tituloSeccion(texto,fallback){if(textoValido(texto)){const linea=texto.trim().split(/\\r?\\n/).find(x=>x.trim());if(linea&&/^historia\\s+paralela/i.test(linea.trim()))return linea.trim();}return fallback;}
+function textoValido(x){return typeof x==="string"&&x.trim().length>0;}
+function imagenesArray(x){return Array.isArray(x)?x:[];}
+function tituloSeccion(texto,fallback){if(textoValido(texto)){const linea=texto.trim().split(/\r?\n/).find(x=>x.trim());if(linea&&/^historia\s+paralela/i.test(linea.trim()))return linea.trim();}return fallback;}
 function agregarSeccion(items,item){if(textoValido(item.contenido))items.push(item);}
 function agregarBloque(items,tipo,clave,titulo,bloque,imagenes=[]){
  if(textoValido(bloque)){agregarSeccion(items,{tipo,clave,titulo,parte:"",imagenes,contenido:bloque});return;}
