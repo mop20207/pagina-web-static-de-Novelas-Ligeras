@@ -82,55 +82,85 @@ function construirIndice(v) {
 
 
 
-function recolectarImagenesUsadas(valor, salida = new Set()) {
-    if (!valor || typeof valor !== "object") return salida;
-    for (const [clave, dato] of Object.entries(valor)) {
-        if (["imagenes_extra","ilustraciones","ilustraciones_extra","imagenes_no_asignadas"].includes(clave)) continue;
-        if (typeof dato === "string" && /\.(?:jpe?g|png|webp|gif)(?:[?#].*)?$/i.test(dato)) {
-            if (clave === "imagen" || clave === "imagenes" || clave.endsWith("_imagenes")) salida.add(dato);
-        } else if (Array.isArray(dato)) {
-            dato.forEach(x => {
-                if (typeof x === "string" && x.trim()) salida.add(x);
-                else if (x && typeof x === "object") recolectarImagenesUsadas(x, salida);
-            });
-        } else if (dato && typeof dato === "object") recolectarImagenesUsadas(dato, salida);
-    }
-    return salida;
-}
 function nombreImagen(url) {
-    try { return decodeURIComponent(new URL(url).pathname.split("/").pop()); }
-    catch { return String(url).split("/").pop(); }
+    try { return decodeURIComponent(new URL(url, location.href).pathname.split("/").pop()).toLowerCase(); }
+    catch { return String(url).split(/[?#]/)[0].split("/").pop().toLowerCase(); }
 }
-function tituloIlustracion(url, numero) {
+function urlImagenNormalizada(url) {
     const nombre = nombreImagen(url);
-    const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\d+)/i);
-    return "Volumen " + numero + " · Ilustración extra" +
-        (pagina ? " · Página " + Number(pagina[1]) : "") +
-        " · Sin capítulo asignado";
+    return nombre;
 }
-async function obtenerIlustracionesExtras(v, id, numero) {
-    const usadas = recolectarImagenesUsadas(v);
-    const candidatas = [
-        ...imagenesArray(v.imagenes_extra),
-        ...imagenesArray(v.ilustraciones),
-        ...imagenesArray(v.ilustraciones_extra),
-        ...imagenesArray(v.imagenes_no_asignadas)
-    ].map(x => typeof x === "string" ? x : (x && (x.url || x.imagen)));
-    // KonoSuba guarda además imágenes individuales en una carpeta común.
-    // Se listan solo los archivos del volumen actual y luego se excluyen los ya usados.
-    if (id === "konosuba") {
-        try {
-            const api = "https://api.github.com/repos/mop20207/Targeta-NL/contents/volumenes/konosuba/imagenes";
-            const respuesta = await fetch(api);
-            if (respuesta.ok) {
-                const archivos = await respuesta.json();
-                const prefijo = "konosuba-vol-" + numero + "-";
-                archivos.filter(x => x.type === "file" && x.name.toLowerCase().startsWith(prefijo))
-                    .forEach(x => candidatas.push(x.download_url));
-            }
-        } catch (e) { console.warn("No se pudo consultar la carpeta de ilustraciones:", e); }
+function imagenesDeSecciones(v, items) {
+    const usadas = new Set();
+    if (typeof v.imagen === "string" && v.imagen.trim()) usadas.add(urlImagenNormalizada(v.imagen));
+    for (const item of items) {
+        for (const url of (item.imagenes || [])) {
+            if (typeof url === "string" && url.trim()) usadas.add(urlImagenNormalizada(url));
+        }
     }
-    return [...new Set(candidatas.filter(x => typeof x === "string" && x.trim() && x !== v.imagen && !usadas.has(x)))];
+    return usadas;
+}
+let arbolImagenesRepositorio = null;
+async function obtenerArbolImagenesRepositorio() {
+    if (!arbolImagenesRepositorio) {
+        arbolImagenesRepositorio = fetch("https://api.github.com/repos/mop20207/Targeta-NL/git/trees/main?recursive=1")
+            .then(r => { if (!r.ok) throw Error("No se pudo consultar el índice de imágenes."); return r.json(); })
+            .then(data => (data.tree || []).filter(x => x.type === "blob" && /\\.(?:jpe?g|png|webp|gif)$/i.test(x.path)).map(x => x.path))
+            .catch(e => { arbolImagenesRepositorio = null; throw e; });
+    }
+    return arbolImagenesRepositorio;
+}
+function carpetaImagenesNovela(id) {
+    return ({ "re-zero":"RE-Zero", "goblin-slayer":"goblin-slayer", "konosuba":"konosuba",
+        "overlord":"overlord", "the-saga-of-tanya-the-evil":"the-saga-of-tanya-the-evil" })[id] || id;
+}
+function rutaPerteneceAlVolumen(path, numero) {
+    const p = path.toLowerCase();
+    const n = String(numero).padStart(2, "0");
+    const patrones = [
+        new RegExp("(?:^|[/_-])vol[-_ ]?0*" + numero + "(?:[/_.-]|$)", "i"),
+        new RegExp("(?:^|[/_-])volumen[-_ ]?0*" + numero + "(?:[/_.-]|$)", "i")
+    ];
+    return patrones.some(rx => rx.test(p)) ||
+        new RegExp("vol[-_ ]" + n + "[-_ ]pagina", "i").test(p);
+}
+function tituloIlustracion(url, numero, ruta = "") {
+    const nombre = nombreImagen(url);
+    const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\\d+)/i);
+    const capitulo = nombre.match(/cap(?:itulo)?[-_ ]?0*(\\d+)/i);
+    const origen = capitulo ? " · Capítulo " + Number(capitulo[1]) : (pagina ? " · Página " + Number(pagina[1]) : "");
+    return "Volumen " + numero + " · Ilustración extra" + origen + " · No aparece en el lector";
+}
+async function obtenerIlustracionesExtras(v, id, numero, items = []) {
+    const usadas = imagenesDeSecciones(v, items);
+    const candidatas = [];
+    const agregar = x => {
+        const url = typeof x === "string" ? x : (x && (x.url || x.imagen || x.src));
+        if (typeof url === "string" && url.trim()) candidatas.push(url);
+    };
+    for (const campo of ["imagenes_extra", "ilustraciones", "ilustraciones_extra", "imagenes_no_asignadas"]) {
+        const valor = v[campo];
+        if (Array.isArray(valor)) valor.forEach(agregar);
+        else if (valor && typeof valor === "object") Object.values(valor).forEach(agregar);
+    }
+    try {
+        const carpeta = carpetaImagenesNovela(id);
+        const rutas = await obtenerArbolImagenesRepositorio();
+        const prefijo = "volumenes/" + carpeta.toLowerCase() + "/";
+        rutas.filter(path => path.toLowerCase().startsWith(prefijo) && rutaPerteneceAlVolumen(path, numero))
+            .forEach(path => candidatas.push("https://raw.githubusercontent.com/mop20207/Targeta-NL/main/" + path.split("/").map(encodeURIComponent).join("/")));
+    } catch (e) {
+        console.warn("No se pudieron revisar las carpetas de ilustraciones del volumen:", e);
+    }
+    const portada = v.imagen ? urlImagenNormalizada(v.imagen) : "";
+    const resultado = new Map();
+    for (const url of candidatas) {
+        const nombre = urlImagenNormalizada(url);
+        if (!nombre || nombre === portada || usadas.has(nombre)) continue;
+        if (/^(?:portada|cover)(?:[-_.]|$)/i.test(nombre)) continue;
+        if (!resultado.has(nombre)) resultado.set(nombre, url);
+    }
+    return [...resultado.values()];
 }
 function mostrarIlustracionesExtras(imagenes, numero) {
     const boton = document.getElementById("boton-ilustraciones-extras");
@@ -209,7 +239,7 @@ async function cargarIndice() {
         const portada=document.getElementById("portada-volumen");
         if(v.imagen){portada.src=v.imagen;portada.hidden=false;}
         const items=construirIndice(v); lista.replaceChildren();
-        const extras = await obtenerIlustracionesExtras(v, id, numero);
+        const extras = await obtenerIlustracionesExtras(v, id, numero, items);
         mostrarIlustracionesExtras(extras, numero);
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
