@@ -10,7 +10,7 @@ function obtenerVolumen(json,numero){
  if("capitulos"in json||"titulo"in json||"prologo"in json)return json;
  return Object.values(json).find(x=>x&&typeof x==="object"&&("capitulos"in x||"titulo"in x||"prologo"in x))||null;
 }
-function textoValido(x){return typeof x==="string"&&x.trim().length>0;}
+function textoValido(x){return typeof x==="string"&&x.trim().length>0;}\nfunction imagenesArray(x){return Array.isArray(x)?x:[];}\nfunction tituloSeccion(texto,fallback){if(textoValido(texto)){const linea=texto.trim().split(/\\r?\\n/).find(x=>x.trim());if(linea&&/^historia\\s+paralela/i.test(linea.trim()))return linea.trim();}return fallback;}
 function agregarSeccion(items,item){if(textoValido(item.contenido))items.push(item);}
 function agregarBloque(items,tipo,clave,titulo,bloque,imagenes=[]){
  if(textoValido(bloque)){agregarSeccion(items,{tipo,clave,titulo,parte:"",imagenes,contenido:bloque});return;}
@@ -21,7 +21,7 @@ function agregarBloque(items,tipo,clave,titulo,bloque,imagenes=[]){
 }
 function construirSecuencia(v){
  const items=[];
- agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,[...(v.prologo_imagenes||[]),...(v.imagenes_prologo||[])]);
+ agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,[...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)]);
  for(const[ck,c]of Object.entries(v.capitulos||{})){
   if(!c||typeof c!=="object")continue;
   const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])];
@@ -35,7 +35,7 @@ function construirSecuencia(v){
   if(vistos.has(campo))continue;vistos.add(campo);const valor=v[campo];if(valor==null)continue;
   if(Array.isArray(valor))valor.forEach((b,i)=>agregarBloque(items,tipo,campo+"_"+i,(b&&b.titulo)||etiqueta+" "+(i+1),b));
   else if(typeof valor==="object")for(const[key,b]of Object.entries(valor))agregarBloque(items,tipo,key,(b&&b.titulo)||etiqueta+" — "+key,b);
-  else if(textoValido(valor))agregarBloque(items,tipo,campo,etiqueta,valor);
+  else if(textoValido(valor))agregarBloque(items,tipo,campo,tituloSeccion(valor,etiqueta),valor);
  }
  return items;
 }
