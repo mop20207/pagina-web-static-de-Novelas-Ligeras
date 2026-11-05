@@ -10,6 +10,13 @@ const CARPETAS_NOVELAS = {
     "re-zero": "RE-Zero"
 };
 
+function normalizarImagenVolumen(url, carpeta) {
+    if (typeof url !== "string" || !url.trim()) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    const nombre = url.split("/").pop();
+    return URL_RAW_VOLUMENES + encodeURIComponent(carpeta) + "/imagenes/" + encodeURIComponent(nombre);
+}
+
 document.addEventListener("DOMContentLoaded", cargarDetalle);
 
 
@@ -338,7 +345,7 @@ async function cargarVolumenes(id) {
 
                 imagen.className = "imagen-volumen";
 
-                imagen.src = volumen.imagen;
+                imagen.src = normalizarImagenVolumen(volumen.imagen, carpeta);
 
                 imagen.alt =
                     "Portada del volumen " + volumen.numero;
