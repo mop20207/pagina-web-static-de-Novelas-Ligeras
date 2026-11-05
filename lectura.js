@@ -1,5 +1,10 @@
 const URL_VOLUMENES="https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/";
 const CARPETAS_NOVELAS={"re-zero":"RE-Zero"};
+const ARCHIVOS_EXTRA={
+ "consultando-demonio-enmascarado":"consultando-demonio-enmascarado.json",
+ "vanir-extras":"vanir-extras.json",
+ "grupo-ladrones-megumin":"grupo-ladrones-megumin.json"
+};
 let secuencia=[],posicion=0;
 document.addEventListener("DOMContentLoaded",iniciarLector);
 function carpetaNovela(id){return CARPETAS_NOVELAS[id]||id;}
@@ -52,15 +57,29 @@ async function iniciarLector(){
  const error=document.getElementById("error");
  try{
   if(!id||!tipo||!clave)throw Error("Faltan datos para abrir este apartado.");
-  const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
-  if(!r.ok)throw Error("No se pudo cargar el JSON del volumen.");
-  const v=obtenerVolumen(await r.json(),numero);if(!v)throw Error("No se encontró el contenido del volumen.");
-  secuencia=construirSecuencia(v,id);
+  const slugExtra=p.get("extra");
+  let v, indice;
+  if(slugExtra){
+   const archivo=ARCHIVOS_EXTRA[slugExtra];
+   if(id!=="konosuba"||!archivo)throw Error("No se encontró la historia extra solicitada.");
+   const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/"+archivo);
+   if(!r.ok)throw Error("No se pudo cargar el JSON del Vol. Extra.");
+   const json=await r.json();
+   v=Object.values(json).find(x=>x&&typeof x==="object"&&typeof x.contenido==="string");
+   if(!v)throw Error("El JSON del Vol. Extra no contiene contenido válido.");
+   secuencia=[{tipo:"historia_extra",clave:"contenido",titulo:v.titulo||"Vol. Extra",parte:"",imagenes:[],contenido:v.contenido}];
+   indice="muestra-contenido.html?novela="+encodeURIComponent(id)+"&extra="+encodeURIComponent(slugExtra);
+  }else{
+   const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
+   if(!r.ok)throw Error("No se pudo cargar el JSON del volumen.");
+   v=obtenerVolumen(await r.json(),numero);if(!v)throw Error("No se encontró el contenido del volumen.");
+   secuencia=construirSecuencia(v,id);
+   indice="muestra-contenido.html?novela="+encodeURIComponent(id)+"&vol="+numero;
+  }
   posicion=secuencia.findIndex(x=>x.tipo===tipo&&x.clave===clave&&(x.parte||"")===parte);
   if(posicion<0)throw Error("No se encontró el apartado solicitado.");
-  const indice="muestra-contenido.html?novela="+encodeURIComponent(id)+"&vol="+numero;
   document.getElementById("volver-indice").href=indice;document.getElementById("ir-indice").href=indice;
-  mostrarActual();document.title=secuencia[posicion].titulo+" | "+(v.titulo||"Lectura");
+  mostrarActual();document.title=secuencia[posicion].titulo+" | "+(v?.titulo||"Lectura");
  }catch(e){console.error(e);error.textContent=e.message;error.hidden=false;document.getElementById("titulo-apartado").textContent="No se pudo abrir la lectura";document.getElementById("progreso").textContent="";}
 }
 function mostrarActual(){
