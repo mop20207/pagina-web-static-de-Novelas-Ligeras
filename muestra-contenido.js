@@ -1,5 +1,10 @@
 const URL_VOLUMENES = "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/";
 const CARPETAS_NOVELAS = { "re-zero": "RE-Zero" };
+const ARCHIVOS_EXTRA = {
+    "consultando-demonio-enmascarado": "consultando-demonio-enmascarado.json",
+    "vanir-extras": "vanir-extras.json",
+    "grupo-ladrones-megumin": "grupo-ladrones-megumin.json"
+};
 
 document.addEventListener("DOMContentLoaded", () => { cargarIndice(); configurarZoom(); });
 function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
@@ -245,27 +250,50 @@ async function cargarIndice() {
     const lista=document.getElementById("lista-contenido"), estado=document.getElementById("estado");
     try {
         if(!id) throw Error("No se indicó la novela.");
-        const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
-        if(!r.ok) throw Error("No se encontró el volumen solicitado.");
-        const v=obtenerVolumen(await r.json(),numero);
-        if(!v) throw Error("El JSON no contiene una estructura de volumen reconocible.");
-        document.title=(v.titulo||"Volumen "+numero)+" | Índice";
-        document.getElementById("titulo-volumen").textContent=v.titulo||"Volumen "+numero;
-        document.getElementById("subtitulo-volumen").textContent="Volumen "+numero+" · Selecciona un apartado para leer.";
-        document.getElementById("migas").textContent="Inicio / "+id+" / Volumen "+numero;
+        const slugExtra = p.get("extra");
+        let v, tituloVista, etiquetaVista, items;
+        if (slugExtra) {
+            const archivo = ARCHIVOS_EXTRA[slugExtra];
+            if (id !== "konosuba" || !archivo) throw Error("No se encontró la historia extra solicitada.");
+            const r = await fetch(URL_VOLUMENES + encodeURIComponent(carpetaNovela(id)) + "/" + archivo);
+            if (!r.ok) throw Error("No se pudo cargar el Vol. Extra solicitado.");
+            const json = await r.json();
+            v = Object.values(json).find(x => x && typeof x === "object" && typeof x.contenido === "string");
+            if (!v) throw Error("El JSON del Vol. Extra no contiene contenido válido.");
+            tituloVista = v.titulo || "Vol. Extra";
+            etiquetaVista = "Vol. Extra";
+            items = [{ tipo: "historia_extra", clave: "contenido", titulo: tituloVista, parte: "", imagenes: [], contenido: v.contenido }];
+        } else {
+            const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
+            if(!r.ok) throw Error("No se encontró el volumen solicitado.");
+            v=obtenerVolumen(await r.json(),numero);
+            if(!v) throw Error("El JSON no contiene una estructura de volumen reconocible.");
+            tituloVista=v.titulo||"Volumen "+numero;
+            etiquetaVista="Volumen "+numero;
+            items=construirIndice(v,id);
+        }
+        document.title=tituloVista+" | Índice";
+        document.getElementById("titulo-volumen").textContent=tituloVista;
+        document.getElementById("subtitulo-volumen").textContent=etiquetaVista+" · Selecciona un apartado para leer.";
+        document.getElementById("migas").textContent="Inicio / "+id+" / "+etiquetaVista;
         document.getElementById("volver-novela").href="detalle.html?id="+encodeURIComponent(id);
         const portada=document.getElementById("portada-volumen");
-        if(v.imagen){portada.src=normalizarUrlImagen(v.imagen,id);portada.hidden=false;}
-        const items=construirIndice(v,id); lista.replaceChildren();
-        const extras = await obtenerIlustracionesExtras(v, id, numero, items);
-        mostrarIlustracionesExtras(extras, numero);
+        if(v.imagen && !slugExtra){portada.src=normalizarUrlImagen(v.imagen,id);portada.hidden=false;} else { portada.hidden=true; }
+        lista.replaceChildren();
+        if (!slugExtra) {
+            const extras = await obtenerIlustracionesExtras(v, id, numero, items);
+            mostrarIlustracionesExtras(extras, numero);
+        } else {
+            mostrarIlustracionesExtras([], numero);
+        }
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
             const n=document.createElement("span"); n.className="numero"; n.textContent=String(i+1).padStart(2,"0");
             const wrap=document.createElement("span"), strong=document.createElement("strong"), small=document.createElement("small");
             strong.textContent=item.titulo; small.textContent=item.tipo==="parte"?"Capítulo / sección":item.tipo;
             wrap.append(strong,small); a.append(n,wrap);
-            const q=new URLSearchParams({novela:id,vol:String(numero),tipo:item.tipo,clave:item.clave});
+            const q=new URLSearchParams({novela:id,tipo:item.tipo,clave:item.clave});
+            if (slugExtra) q.set("extra", slugExtra); else q.set("vol", String(numero));
             if(item.parte) q.set("parte",item.parte);
             a.href="lectura.html?"+q.toString(); lista.append(a);
         });
