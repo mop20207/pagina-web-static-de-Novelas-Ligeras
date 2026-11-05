@@ -209,7 +209,8 @@ async function cargarIndice() {
         const portada=document.getElementById("portada-volumen");
         if(v.imagen){portada.src=v.imagen;portada.hidden=false;}
         const items=construirIndice(v); lista.replaceChildren();
-        const extras = await obtenerIlustracionesExtras(v, id, numero);\n        mostrarIlustracionesExtras(extras, numero);
+        const extras = await obtenerIlustracionesExtras(v, id, numero);
+        mostrarIlustracionesExtras(extras, numero);
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
             const n=document.createElement("span"); n.className="numero"; n.textContent=String(i+1).padStart(2,"0");
