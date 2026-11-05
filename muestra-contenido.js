@@ -105,7 +105,7 @@ async function obtenerArbolImagenesRepositorio() {
     if (!arbolImagenesRepositorio) {
         arbolImagenesRepositorio = fetch("https://api.github.com/repos/mop20207/Targeta-NL/git/trees/main?recursive=1")
             .then(r => { if (!r.ok) throw Error("No se pudo consultar el índice de imágenes."); return r.json(); })
-            .then(data => (data.tree || []).filter(x => x.type === "blob" && /\\.(?:jpe?g|png|webp|gif)$/i.test(x.path)).map(x => x.path))
+            .then(data => (data.tree || []).filter(x => x.type === "blob" && /\.(?:jpe?g|png|webp|gif)$/i.test(x.path)).map(x => x.path))
             .catch(e => { arbolImagenesRepositorio = null; throw e; });
     }
     return arbolImagenesRepositorio;
@@ -126,8 +126,8 @@ function rutaPerteneceAlVolumen(path, numero) {
 }
 function tituloIlustracion(url, numero, ruta = "") {
     const nombre = nombreImagen(url);
-    const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\\d+)/i);
-    const capitulo = nombre.match(/cap(?:itulo)?[-_ ]?0*(\\d+)/i);
+    const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\d+)/i);
+    const capitulo = nombre.match(/cap(?:itulo)?[-_ ]?0*(\d+)/i);
     const origen = capitulo ? " · Capítulo " + Number(capitulo[1]) : (pagina ? " · Página " + Number(pagina[1]) : "");
     return "Volumen " + numero + " · Ilustración extra" + origen + " · No aparece en el lector";
 }
