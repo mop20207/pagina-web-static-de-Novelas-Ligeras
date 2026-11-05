@@ -26,7 +26,8 @@ const VOLUMENES_EXTRA = {
         "archivo": "vanir-extras.json",
         "titulo": "Vanir Extras",
         "numero": 2,
-        "despuesDe": 8
+        "despuesDe": 8,
+        "imagen": "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/konosuba/imagenes/consultando-demonio-enmascarado-ilustracion-pagina-001.jpg"
     },
     {
         "slug": "grupo-ladrones-megumin",
