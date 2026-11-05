@@ -151,7 +151,7 @@ function tituloIlustracion(url, numero, ruta = "") {
     const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\d+)/i);
     const capitulo = nombre.match(/cap(?:itulo)?[-_ ]?0*(\d+)/i);
     const origen = capitulo ? " · Capítulo " + Number(capitulo[1]) : (pagina ? " · Página " + Number(pagina[1]) : "");
-    return "Volumen " + numero + " · Ilustración extra" + origen + " · No aparece en el lector";
+    return (String(numero).startsWith("Extra") ? "Vol. " + numero : "Volumen " + numero) + " · Ilustración extra" + origen + " · No aparece en el lector";
 }
 async function obtenerIlustracionesExtras(v, id, numero, items = []) {
     const usadas = imagenesDeSecciones(v, items);
@@ -284,7 +284,11 @@ async function cargarIndice() {
             const extras = await obtenerIlustracionesExtras(v, id, numero, items);
             mostrarIlustracionesExtras(extras, numero);
         } else {
-            mostrarIlustracionesExtras([], numero);
+            const numeroExtra = ({ "consultando-demonio-enmascarado": 1, "vanir-extras": 2, "grupo-ladrones-megumin": 3 })[slugExtra];
+            const imagenesExtra = Array.isArray(v.imagenes_extras)
+                ? v.imagenes_extras.map(url => normalizarUrlImagen(url, id)).filter(Boolean)
+                : [];
+            mostrarIlustracionesExtras(imagenesExtra, "Extra " + numeroExtra);
         }
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
