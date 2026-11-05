@@ -13,10 +13,11 @@ function obtenerVolumen(json, numero) {
         ("capitulos" in x || "titulo" in x || "prologo" in x)) || null;
 }
 function textoValido(x) { return typeof x === "string" && x.trim().length > 0; }
+function imagenesArray(x) { return Array.isArray(x) ? x : []; }
 function tituloDesdeTexto(s, fallback) {
     if (!textoValido(s)) return fallback;
     const primera = s.trim().split(/\r?\n/).find(x => x.trim());
-    return primera && primera.length <= 110 ? primera.trim() : fallback;
+    return primera && /^historia\\s+paralela/i.test(primera.trim()) ? primera.trim() : (primera && primera.length <= 110 ? primera.trim() : fallback);
 }
 function agregarSeccion(items, item) {
     if (textoValido(item.contenido)) items.push(item);
