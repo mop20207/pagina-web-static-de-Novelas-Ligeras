@@ -238,14 +238,24 @@ async function cargarVolumenes(id) {
 
                     const volumen =
                         json["volumen_" + numero] ||
-                        Object.values(json).find(x =>
-                            x &&
-                            typeof x === "object" &&
+                        (
+                            json &&
+                            typeof json === "object" &&
                             (
-                                "titulo" in x ||
-                                "capitulos" in x ||
-                                "prologo" in x
+                                "titulo" in json ||
+                                "capitulos" in json ||
+                                "prologo" in json
                             )
+                                ? json
+                                : Object.values(json || {}).find(x =>
+                                    x &&
+                                    typeof x === "object" &&
+                                    (
+                                        "titulo" in x ||
+                                        "capitulos" in x ||
+                                        "prologo" in x
+                                    )
+                                )
                         );
 
                     if (!volumen) return null;
