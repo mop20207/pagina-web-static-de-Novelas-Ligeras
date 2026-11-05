@@ -10,6 +10,33 @@ const CARPETAS_NOVELAS = {
     "re-zero": "RE-Zero"
 };
 
+// Historias complementarias de KonoSuba, intercaladas en el orden de lectura.
+const VOLUMENES_EXTRA = {
+    konosuba: [
+    {
+        "slug": "consultando-demonio-enmascarado",
+        "archivo": "consultando-demonio-enmascarado.json",
+        "titulo": "Consultando a este ¡Demonio Enmascarado!",
+        "numero": 1,
+        "despuesDe": 8
+    },
+    {
+        "slug": "vanir-extras",
+        "archivo": "vanir-extras.json",
+        "titulo": "Vanir Extras",
+        "numero": 2,
+        "despuesDe": 8
+    },
+    {
+        "slug": "grupo-ladrones-megumin",
+        "archivo": "grupo-ladrones-megumin.json",
+        "titulo": "El Grupo de Ladrones de Megumin",
+        "numero": 3,
+        "despuesDe": 10
+    }
+]
+};
+
 function normalizarImagenVolumen(url, carpeta) {
     if (typeof url !== "string" || !url.trim()) return "";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
@@ -297,95 +324,69 @@ async function cargarVolumenes(id) {
 
 
         const volumenes = resultados.filter(Boolean);
+        const historiasExtra = VOLUMENES_EXTRA[id] || [];
 
-
-        if (volumenes.length === 0) {
-
+        if (volumenes.length === 0 && historiasExtra.length === 0) {
             contador.textContent = "0 volúmenes";
-
-            aviso.textContent =
-                "Se encontraron archivos, pero ninguno contiene datos de volumen válidos.";
-
+            aviso.textContent = "Esta novela todavía no tiene archivos de volúmenes cargados.";
             return;
-
         }
 
+        contador.textContent = volumenes.length +
+            (volumenes.length === 1 ? " volumen" : " volúmenes") +
+            (historiasExtra.length ? " · " + historiasExtra.length + " extras" : "");
+        aviso.textContent = "Volúmenes y Vol. Extra disponibles para leer.";
 
-        // MOSTRAR CONTADOR
+        // Insertar cada historia extra después del volumen indicado.
+        const entradas = [];
+        for (const volumen of volumenes) {
+            entradas.push({ tipo: "volumen", datos: volumen });
+            historiasExtra.filter(extra => extra.despuesDe === volumen.numero)
+                .forEach(extra => entradas.push({ tipo: "extra", datos: extra }));
+        }
+        // Si el volumen de referencia aún no está cargado, no perder el extra.
+        historiasExtra.filter(extra => !volumenes.some(v => v.numero === extra.despuesDe))
+            .forEach(extra => entradas.push({ tipo: "extra", datos: extra }));
 
-        contador.textContent =
-            volumenes.length +
-            (volumenes.length === 1
-                ? " volumen"
-                : " volúmenes");
-
-        aviso.textContent = "Volúmenes disponibles para leer.";
-
-
-        // CREAR TARJETAS
-
-        volumenes.forEach(volumen => {
-
+        entradas.forEach(entrada => {
             const tarjeta = document.createElement("a");
-
             tarjeta.className = "volumen volumen-real";
-
-            tarjeta.href =
-                "muestra-contenido.html?novela=" +
-                encodeURIComponent(id) +
-                "&vol=" +
-                volumen.numero;
-
-
-            // IMAGEN DEL VOLUMEN
-
-            if (volumen.imagen) {
-
-                const imagen = document.createElement("img");
-
-                imagen.className = "imagen-volumen";
-
-                imagen.src = normalizarImagenVolumen(volumen.imagen, carpeta);
-
-                imagen.alt =
-                    "Portada del volumen " + volumen.numero;
-
-                imagen.loading = "lazy";
-
-                tarjeta.append(imagen);
-
+            const esExtra = entrada.tipo === "extra";
+            if (esExtra) {
+                const extra = entrada.datos;
+                tarjeta.href = "muestra-contenido.html?novela=" + encodeURIComponent(id) +
+                    "&extra=" + encodeURIComponent(extra.slug);
+                const numero = document.createElement("span");
+                numero.className = "volumen-numero";
+                numero.textContent = "Vol. Extra " + extra.numero;
+                const titulo = document.createElement("h3");
+                titulo.textContent = extra.titulo;
+                const enlace = document.createElement("span");
+                enlace.className = "enlace-volumen";
+                enlace.textContent = "Ver contenido →";
+                tarjeta.append(numero, titulo, enlace);
+            } else {
+                const volumen = entrada.datos;
+                tarjeta.href = "muestra-contenido.html?novela=" + encodeURIComponent(id) + "&vol=" + volumen.numero;
+                if (volumen.imagen) {
+                    const imagen = document.createElement("img");
+                    imagen.className = "imagen-volumen";
+                    imagen.src = normalizarImagenVolumen(volumen.imagen, carpeta);
+                    imagen.alt = "Portada del volumen " + volumen.numero;
+                    imagen.loading = "lazy";
+                    tarjeta.append(imagen);
+                }
+                const numero = document.createElement("span");
+                numero.className = "volumen-numero";
+                numero.textContent = "Vol. " + volumen.numero;
+                const titulo = document.createElement("h3");
+                titulo.textContent = volumen.titulo;
+                const enlace = document.createElement("span");
+                enlace.className = "enlace-volumen";
+                enlace.textContent = "Ver contenido →";
+                tarjeta.append(numero, titulo, enlace);
             }
-
-
-            // NÚMERO
-
-            const numero = document.createElement("span");
-
-            numero.className = "volumen-numero";
-
-            numero.textContent = "Vol. " + volumen.numero;
-
-
-            // TÍTULO
-
-            const titulo = document.createElement("h3");
-
-            titulo.textContent = volumen.titulo;
-
-
-            // ENLACE
-
-            const enlace = document.createElement("span");
-
-            enlace.className = "enlace-volumen";
-
-            enlace.textContent = "Ver contenido →";
-
-
-            tarjeta.append(numero, titulo, enlace);
-
             lista.append(tarjeta);
-
         });
 
     } catch (e) {
