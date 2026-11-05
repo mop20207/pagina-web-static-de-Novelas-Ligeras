@@ -3,6 +3,12 @@ const CARPETAS_NOVELAS={"re-zero":"RE-Zero"};
 let secuencia=[],posicion=0;
 document.addEventListener("DOMContentLoaded",iniciarLector);
 function carpetaNovela(id){return CARPETAS_NOVELAS[id]||id;}
+function normalizarUrlImagen(url,id){
+ if(typeof url!=="string"||!url.trim())return "";
+ if(url.startsWith("http://")||url.startsWith("https://"))return url;
+ const nombre=url.split("/").pop();
+ return "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/"+encodeURIComponent(carpetaNovela(id))+"/imagenes/"+encodeURIComponent(nombre);
+}
 function obtenerVolumen(json,numero){
  if(!json||typeof json!=="object")return null;
  const candidato=json["volumen_"+numero];
@@ -13,7 +19,7 @@ function obtenerVolumen(json,numero){
 function textoValido(x){return typeof x==="string"&&x.trim().length>0;}
 function imagenesArray(x){return Array.isArray(x)?x:[];}
 function tituloSeccion(texto,fallback){if(textoValido(texto)){const linea=texto.trim().split(/\r?\n/).find(x=>x.trim());if(linea&&/^historia\s+paralela/i.test(linea.trim()))return linea.trim();}return fallback;}
-function agregarSeccion(items,item){if(textoValido(item.contenido))items.push(item);}
+function agregarSeccion(items,item){let contenido=item.contenido;if(contenido&&typeof contenido==="object"){if(textoValido(contenido.titulo)){const base=String(item.titulo||"").split(" — ")[0];item.titulo=base+" — "+contenido.titulo;}contenido=contenido.contenido;}if(!textoValido(contenido))return;item.contenido=contenido;items.push(item);}
 function agregarBloque(items,tipo,clave,titulo,bloque,imagenes=[]){
  if(textoValido(bloque)){agregarSeccion(items,{tipo,clave,titulo,parte:"",imagenes,contenido:bloque});return;}
  if(!bloque||typeof bloque!=="object")return;
@@ -21,12 +27,12 @@ function agregarBloque(items,tipo,clave,titulo,bloque,imagenes=[]){
  if(textoValido(bloque.contenido)){agregarSeccion(items,{tipo,clave,titulo:bloque.titulo||titulo,parte:"",imagenes:imgs,contenido:bloque.contenido});return;}
  if(bloque.partes&&typeof bloque.partes==="object")for(const[pk,body]of Object.entries(bloque.partes))agregarSeccion(items,{tipo:"parte",clave,titulo:(bloque.titulo||titulo)+" — "+pk.replaceAll("_"," "),parte:pk,imagenes:imgs,contenido:body});
 }
-function construirSecuencia(v){
+function construirSecuencia(v,id){
  const items=[];
- agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,[...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)]);
+ agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,[...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)].map(url=>normalizarUrlImagen(url,id)));
  for(const[ck,c]of Object.entries(v.capitulos||{})){
   if(!c||typeof c!=="object")continue;
-  const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])];
+  const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])].map(url=>normalizarUrlImagen(url,id)).filter(Boolean);
   if(c.partes&&typeof c.partes==="object"){
    for(const[pk,body]of Object.entries(c.partes))agregarSeccion(items,{tipo:"parte",clave:ck,titulo:(c.titulo||ck)+" — "+pk.replaceAll("_"," "),parte:pk,imagenes:imgs,contenido:body});
   }else if(textoValido(c.contenido))agregarSeccion(items,{tipo:"parte",clave:ck,titulo:c.titulo||ck,parte:"",imagenes:imgs,contenido:c.contenido});
@@ -49,7 +55,7 @@ async function iniciarLector(){
   const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
   if(!r.ok)throw Error("No se pudo cargar el JSON del volumen.");
   const v=obtenerVolumen(await r.json(),numero);if(!v)throw Error("No se encontró el contenido del volumen.");
-  secuencia=construirSecuencia(v);
+  secuencia=construirSecuencia(v,id);
   posicion=secuencia.findIndex(x=>x.tipo===tipo&&x.clave===clave&&(x.parte||"")===parte);
   if(posicion<0)throw Error("No se encontró el apartado solicitado.");
   const indice="muestra-contenido.html?novela="+encodeURIComponent(id)+"&vol="+numero;
