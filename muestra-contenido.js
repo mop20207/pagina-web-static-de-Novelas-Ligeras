@@ -1,7 +1,7 @@
 const URL_VOLUMENES = "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/";
 const CARPETAS_NOVELAS = { "re-zero": "RE-Zero" };
 
-document.addEventListener("DOMContentLoaded", cargarIndice);
+document.addEventListener("DOMContentLoaded", () => { cargarIndice(); configurarZoom(); });
 function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
 
 function obtenerVolumen(json, numero) {
@@ -81,10 +81,11 @@ function construirIndice(v) {
 }
 
 
-function recolectarImagenesUsadas(valor, salida = new Set(), esRaiz = false) {
+
+function recolectarImagenesUsadas(valor, salida = new Set()) {
     if (!valor || typeof valor !== "object") return salida;
     for (const [clave, dato] of Object.entries(valor)) {
-        if (esRaiz && ["imagenes_extra", "ilustraciones", "ilustraciones_extra", "imagenes_no_asignadas"].includes(clave)) continue;
+        if (["imagenes_extra","ilustraciones","ilustraciones_extra","imagenes_no_asignadas"].includes(clave)) continue;
         if (typeof dato === "string" && /\.(?:jpe?g|png|webp|gif)(?:[?#].*)?$/i.test(dato)) {
             if (clave === "imagen" || clave === "imagenes" || clave.endsWith("_imagenes")) salida.add(dato);
         } else if (Array.isArray(dato)) {
@@ -92,44 +93,103 @@ function recolectarImagenesUsadas(valor, salida = new Set(), esRaiz = false) {
                 if (typeof x === "string" && x.trim()) salida.add(x);
                 else if (x && typeof x === "object") recolectarImagenesUsadas(x, salida);
             });
-        } else if (dato && typeof dato === "object") {
-            recolectarImagenesUsadas(dato, salida);
-        }
+        } else if (dato && typeof dato === "object") recolectarImagenesUsadas(dato, salida);
     }
     return salida;
 }
-function obtenerIlustracionesExtras(v) {
-    const usadas = recolectarImagenesUsadas(v, new Set(), true);
+function nombreImagen(url) {
+    try { return decodeURIComponent(new URL(url).pathname.split("/").pop()); }
+    catch { return String(url).split("/").pop(); }
+}
+function tituloIlustracion(url, numero) {
+    const nombre = nombreImagen(url);
+    const pagina = nombre.match(/pag(?:ina)?[-_ ]?0*(\d+)/i);
+    return "Volumen " + numero + " · Ilustración extra" +
+        (pagina ? " · Página " + Number(pagina[1]) : "") +
+        " · Sin capítulo asignado";
+}
+async function obtenerIlustracionesExtras(v, id, numero) {
+    const usadas = recolectarImagenesUsadas(v);
     const candidatas = [
         ...imagenesArray(v.imagenes_extra),
         ...imagenesArray(v.ilustraciones),
         ...imagenesArray(v.ilustraciones_extra),
         ...imagenesArray(v.imagenes_no_asignadas)
-    ];
+    ].map(x => typeof x === "string" ? x : (x && (x.url || x.imagen)));
+    // KonoSuba guarda además imágenes individuales en una carpeta común.
+    // Se listan solo los archivos del volumen actual y luego se excluyen los ya usados.
+    if (id === "konosuba") {
+        try {
+            const api = "https://api.github.com/repos/mop20207/Targeta-NL/contents/volumenes/konosuba/imagenes";
+            const respuesta = await fetch(api);
+            if (respuesta.ok) {
+                const archivos = await respuesta.json();
+                const prefijo = "konosuba-vol-" + numero + "-";
+                archivos.filter(x => x.type === "file" && x.name.toLowerCase().startsWith(prefijo))
+                    .forEach(x => candidatas.push(x.download_url));
+            }
+        } catch (e) { console.warn("No se pudo consultar la carpeta de ilustraciones:", e); }
+    }
     return [...new Set(candidatas.filter(x => typeof x === "string" && x.trim() && x !== v.imagen && !usadas.has(x)))];
 }
-function mostrarIlustracionesExtras(v) {
+function mostrarIlustracionesExtras(imagenes, numero) {
+    const boton = document.getElementById("boton-ilustraciones-extras");
     const seccion = document.getElementById("seccion-ilustraciones-extras");
     const galeria = document.getElementById("galeria-ilustraciones-extras");
-    if (!seccion || !galeria) return;
-    const imagenes = obtenerIlustracionesExtras(v);
+    const contador = document.getElementById("contador-ilustraciones-extras");
+    if (!boton || !seccion || !galeria) return;
     galeria.replaceChildren();
-    seccion.hidden = imagenes.length === 0;
+    seccion.hidden = true;
+    boton.hidden = imagenes.length === 0;
+    contador.textContent = imagenes.length + (imagenes.length === 1 ? " imagen" : " imágenes");
     imagenes.forEach((url, i) => {
-        const enlace = document.createElement("a");
-        enlace.className = "ilustracion-extra";
-        enlace.href = url;
-        enlace.target = "_blank";
-        enlace.rel = "noopener";
-        enlace.title = "Abrir ilustración " + (i + 1);
+        const tarjeta = document.createElement("button");
+        tarjeta.type = "button";
+        tarjeta.className = "tarjeta-ilustracion-extra";
+        tarjeta.addEventListener("click", () => abrirZoom(url, tituloIlustracion(url, numero)));
         const img = document.createElement("img");
-        img.src = url;
-        img.alt = "Ilustración extra " + (i + 1);
-        img.loading = "lazy";
-        img.onerror = () => enlace.remove();
-        enlace.append(img);
-        galeria.append(enlace);
+        img.src = url; img.alt = tituloIlustracion(url, numero); img.loading = "lazy";
+        img.onerror = () => tarjeta.remove();
+        const titulo = document.createElement("span");
+        titulo.textContent = tituloIlustracion(url, numero);
+        tarjeta.append(img, titulo); galeria.append(tarjeta);
     });
+    boton.onclick = () => {
+        seccion.hidden = !seccion.hidden;
+        boton.setAttribute("aria-expanded", String(!seccion.hidden));
+        boton.textContent = seccion.hidden ? "Ver ilustraciones extras" : "Ocultar ilustraciones extras";
+        if (!seccion.hidden) seccion.scrollIntoView({behavior:"smooth",block:"start"});
+    };
+}
+function abrirZoom(url, titulo) {
+    const visor = document.getElementById("visor-ilustracion");
+    const imagen = document.getElementById("imagen-ampliada");
+    const leyenda = document.getElementById("titulo-imagen-ampliada");
+    if (!visor || !imagen) return;
+    imagen.src = url; imagen.style.transform = "scale(1)";
+    imagen.dataset.zoom = "1"; leyenda.textContent = titulo;
+    visor.hidden = false; document.body.classList.add("visor-abierto");
+}
+function cerrarZoom() {
+    const visor = document.getElementById("visor-ilustracion");
+    if (visor) visor.hidden = true;
+    document.body.classList.remove("visor-abierto");
+}
+function configurarZoom() {
+    const visor = document.getElementById("visor-ilustracion");
+    const imagen = document.getElementById("imagen-ampliada");
+    document.getElementById("cerrar-visor").addEventListener("click", cerrarZoom);
+    document.getElementById("alejar-imagen").addEventListener("click", () => cambiarZoom(0.8));
+    document.getElementById("acercar-imagen").addEventListener("click", () => cambiarZoom(1.25));
+    visor.addEventListener("click", e => { if (e.target === visor) cerrarZoom(); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") cerrarZoom(); });
+    imagen.addEventListener("click", () => cambiarZoom(imagen.dataset.zoom === "1" ? 1.5 : 1));
+}
+function cambiarZoom(factor) {
+    const imagen = document.getElementById("imagen-ampliada");
+    const actual = Number(imagen.dataset.zoom || 1);
+    const nuevo = Math.max(0.5, Math.min(4, actual * factor));
+    imagen.dataset.zoom = String(nuevo); imagen.style.transform = "scale(" + nuevo + ")";
 }
 
 async function cargarIndice() {
@@ -149,7 +209,7 @@ async function cargarIndice() {
         const portada=document.getElementById("portada-volumen");
         if(v.imagen){portada.src=v.imagen;portada.hidden=false;}
         const items=construirIndice(v); lista.replaceChildren();
-        mostrarIlustracionesExtras(v);
+        const extras = await obtenerIlustracionesExtras(v, id, numero);\n        mostrarIlustracionesExtras(extras, numero);
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
             const n=document.createElement("span"); n.className="numero"; n.textContent=String(i+1).padStart(2,"0");
