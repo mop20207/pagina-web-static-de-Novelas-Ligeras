@@ -3,6 +3,13 @@ const CARPETAS_NOVELAS = { "re-zero": "RE-Zero" };
 
 document.addEventListener("DOMContentLoaded", () => { cargarIndice(); configurarZoom(); });
 function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
+function normalizarUrlImagen(url, id) {
+    if (typeof url !== "string" || !url.trim()) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) return url;
+    const nombre = url.split("/").pop();
+    return "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/" +
+        encodeURIComponent(carpetaNovela(id)) + "/imagenes/" + encodeURIComponent(nombre);
+}
 
 function obtenerVolumen(json, numero) {
     if (!json || typeof json !== "object") return null;
@@ -20,7 +27,17 @@ function tituloDesdeTexto(s, fallback) {
     return primera && /^historia\\s+paralela/i.test(primera.trim()) ? primera.trim() : (primera && primera.length <= 110 ? primera.trim() : fallback);
 }
 function agregarSeccion(items, item) {
-    if (textoValido(item.contenido)) items.push(item);
+    let contenido = item.contenido;
+    if (contenido && typeof contenido === "object") {
+        if (textoValido(contenido.titulo)) {
+            const base = String(item.titulo || "").split(" — ")[0];
+            item.titulo = base + " — " + contenido.titulo;
+        }
+        contenido = contenido.contenido;
+    }
+    if (!textoValido(contenido)) return;
+    item.contenido = contenido;
+    items.push(item);
 }
 function agregarBloque(items, tipo, clave, titulo, bloque, imagenes = []) {
     if (textoValido(bloque)) {
@@ -40,13 +57,13 @@ function agregarBloque(items, tipo, clave, titulo, bloque, imagenes = []) {
         }
     }
 }
-function construirIndice(v) {
+function construirIndice(v, id) {
     const items=[];
     agregarBloque(items,"prologo","prologo","Prólogo",v.prologo,
-        [...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)]);
+        [...imagenesArray(v.prologo_imagenes),...imagenesArray(v.imagenes_prologo)].map(url => normalizarUrlImagen(url, id)));
     for (const [ck,c] of Object.entries(v.capitulos||{})) {
         if (!c || typeof c!=="object") continue;
-        const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])];
+        const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])].map(url => normalizarUrlImagen(url, id)).filter(Boolean);
         if (c.partes && typeof c.partes==="object") {
             for (const [pk,body] of Object.entries(c.partes)) {
                 agregarSeccion(items,{tipo:"parte",clave:ck,titulo:(c.titulo||ck)+" — "+pk.replaceAll("_"," "),parte:pk,imagenes:imgs,contenido:body});
@@ -154,7 +171,8 @@ async function obtenerIlustracionesExtras(v, id, numero, items = []) {
     }
     const portada = v.imagen ? urlImagenNormalizada(v.imagen) : "";
     const resultado = new Map();
-    for (const url of candidatas) {
+    for (const urlOriginal of candidatas) {
+        const url = normalizarUrlImagen(urlOriginal, id);
         const nombre = urlImagenNormalizada(url);
         if (!nombre || nombre === portada || usadas.has(nombre)) continue;
         if (/^(?:portada|cover)(?:[-_.]|$)/i.test(nombre)) continue;
@@ -237,8 +255,8 @@ async function cargarIndice() {
         document.getElementById("migas").textContent="Inicio / "+id+" / Volumen "+numero;
         document.getElementById("volver-novela").href="detalle.html?id="+encodeURIComponent(id);
         const portada=document.getElementById("portada-volumen");
-        if(v.imagen){portada.src=v.imagen;portada.hidden=false;}
-        const items=construirIndice(v); lista.replaceChildren();
+        if(v.imagen){portada.src=normalizarUrlImagen(v.imagen,id);portada.hidden=false;}
+        const items=construirIndice(v,id); lista.replaceChildren();
         const extras = await obtenerIlustracionesExtras(v, id, numero, items);
         mostrarIlustracionesExtras(extras, numero);
         items.forEach((item,i)=>{
