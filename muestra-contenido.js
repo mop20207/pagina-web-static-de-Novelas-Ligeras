@@ -80,6 +80,58 @@ function construirIndice(v) {
     return items;
 }
 
+
+function recolectarImagenesUsadas(valor, salida = new Set(), esRaiz = false) {
+    if (!valor || typeof valor !== "object") return salida;
+    for (const [clave, dato] of Object.entries(valor)) {
+        if (esRaiz && ["imagenes_extra", "ilustraciones", "ilustraciones_extra", "imagenes_no_asignadas"].includes(clave)) continue;
+        if (typeof dato === "string" && /\.(?:jpe?g|png|webp|gif)(?:[?#].*)?$/i.test(dato)) {
+            if (clave === "imagen" || clave === "imagenes" || clave.endsWith("_imagenes")) salida.add(dato);
+        } else if (Array.isArray(dato)) {
+            dato.forEach(x => {
+                if (typeof x === "string" && x.trim()) salida.add(x);
+                else if (x && typeof x === "object") recolectarImagenesUsadas(x, salida);
+            });
+        } else if (dato && typeof dato === "object") {
+            recolectarImagenesUsadas(dato, salida);
+        }
+    }
+    return salida;
+}
+function obtenerIlustracionesExtras(v) {
+    const usadas = recolectarImagenesUsadas(v, new Set(), true);
+    const candidatas = [
+        ...imagenesArray(v.imagenes_extra),
+        ...imagenesArray(v.ilustraciones),
+        ...imagenesArray(v.ilustraciones_extra),
+        ...imagenesArray(v.imagenes_no_asignadas)
+    ];
+    return [...new Set(candidatas.filter(x => typeof x === "string" && x.trim() && x !== v.imagen && !usadas.has(x)))];
+}
+function mostrarIlustracionesExtras(v) {
+    const seccion = document.getElementById("seccion-ilustraciones-extras");
+    const galeria = document.getElementById("galeria-ilustraciones-extras");
+    if (!seccion || !galeria) return;
+    const imagenes = obtenerIlustracionesExtras(v);
+    galeria.replaceChildren();
+    seccion.hidden = imagenes.length === 0;
+    imagenes.forEach((url, i) => {
+        const enlace = document.createElement("a");
+        enlace.className = "ilustracion-extra";
+        enlace.href = url;
+        enlace.target = "_blank";
+        enlace.rel = "noopener";
+        enlace.title = "Abrir ilustración " + (i + 1);
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Ilustración extra " + (i + 1);
+        img.loading = "lazy";
+        img.onerror = () => enlace.remove();
+        enlace.append(img);
+        galeria.append(enlace);
+    });
+}
+
 async function cargarIndice() {
     const p=new URLSearchParams(location.search), id=p.get("novela"), numero=Number(p.get("vol"))||1;
     const lista=document.getElementById("lista-contenido"), estado=document.getElementById("estado");
@@ -97,6 +149,7 @@ async function cargarIndice() {
         const portada=document.getElementById("portada-volumen");
         if(v.imagen){portada.src=v.imagen;portada.hidden=false;}
         const items=construirIndice(v); lista.replaceChildren();
+        mostrarIlustracionesExtras(v);
         items.forEach((item,i)=>{
             const a=document.createElement("a"); a.className="elemento";
             const n=document.createElement("span"); n.className="numero"; n.textContent=String(i+1).padStart(2,"0");
