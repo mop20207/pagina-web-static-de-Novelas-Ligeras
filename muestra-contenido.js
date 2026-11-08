@@ -264,7 +264,7 @@ async function cargarIndice() {
             etiquetaVista = "Vol. Extra";
             items = [{ tipo: "historia_extra", clave: "contenido", titulo: tituloVista, parte: "", imagenes: [], contenido: v.contenido }];
         } else {
-            const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
+            const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+String(numero).padStart(2,"0")+".json");
             if(!r.ok) throw Error("No se encontró el volumen solicitado.");
             v=obtenerVolumen(await r.json(),numero);
             if(!v) throw Error("El JSON no contiene una estructura de volumen reconocible.");
