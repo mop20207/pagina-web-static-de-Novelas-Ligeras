@@ -265,7 +265,7 @@ async function cargarVolumenes(id) {
                         URL_RAW_VOLUMENES +
                         encodeURIComponent(carpeta) +
                         "/vol-" +
-                        numero +
+                        String(numero).padStart(2, "0") +
                         ".json"
                     );
 
