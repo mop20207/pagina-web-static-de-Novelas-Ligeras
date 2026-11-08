@@ -70,7 +70,7 @@ async function iniciarLector(){
    secuencia=[{tipo:"historia_extra",clave:"contenido",titulo:v.titulo||"Vol. Extra",parte:"",imagenes:[],contenido:v.contenido}];
    indice="muestra-contenido.html?novela="+encodeURIComponent(id)+"&extra="+encodeURIComponent(slugExtra);
   }else{
-   const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+numero+".json");
+   const r=await fetch(URL_VOLUMENES+encodeURIComponent(carpetaNovela(id))+"/vol-"+String(numero).padStart(2,"0")+".json");
    if(!r.ok)throw Error("No se pudo cargar el JSON del volumen.");
    v=obtenerVolumen(await r.json(),numero);if(!v)throw Error("No se encontró el contenido del volumen.");
    secuencia=construirSecuencia(v,id);
