@@ -42,9 +42,13 @@ const VOLUMENES_EXTRA = {
 
 function normalizarImagenVolumen(url, carpeta) {
     if (typeof url !== "string" || !url.trim()) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const nombre = url.split("/").pop();
-    return URL_RAW_VOLUMENES + encodeURIComponent(carpeta) + "/imagenes/" + encodeURIComponent(nombre);
+    if (/^https?:\/\//i.test(url)) return url;
+    const ruta = url.trim().replace(/^\.\//, "").split("/").map((parte, i) =>
+        i === 1 && /^volumen-\d+$/i.test(parte)
+            ? "volumen-" + parte.match(/\d+/)[0].padStart(2, "0")
+            : parte
+    ).map(encodeURIComponent).join("/");
+    return URL_RAW_VOLUMENES + encodeURIComponent(carpeta) + "/" + ruta;
 }
 
 document.addEventListener("DOMContentLoaded", cargarDetalle);
