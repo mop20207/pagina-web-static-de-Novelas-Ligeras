@@ -10,10 +10,14 @@ document.addEventListener("DOMContentLoaded", () => { cargarIndice(); configurar
 function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
 function normalizarUrlImagen(url, id) {
     if (typeof url !== "string" || !url.trim()) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    const nombre = url.split("/").pop();
+    if (/^https?:\/\//i.test(url)) return url;
+    const ruta = url.trim().replace(/^\.\//, "").split("/").map((parte, i) =>
+        i === 1 && /^volumen-\d+$/i.test(parte)
+            ? "volumen-" + parte.match(/\d+/)[0].padStart(2, "0")
+            : parte
+    ).map(encodeURIComponent).join("/");
     return "https://raw.githubusercontent.com/mop20207/Targeta-NL/main/volumenes/" +
-        encodeURIComponent(carpetaNovela(id)) + "/imagenes/" + encodeURIComponent(nombre);
+        encodeURIComponent(carpetaNovela(id)) + "/" + ruta;
 }
 
 function obtenerVolumen(json, numero) {
