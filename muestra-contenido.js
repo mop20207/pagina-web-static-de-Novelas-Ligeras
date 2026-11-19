@@ -11,6 +11,10 @@ function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
 function normalizarUrlImagen(url, id) {
     if (typeof url !== "string" || !url.trim()) return "";
     if (/^https?:\/\//i.test(url)) return url;
+    if (/^\.?\/?imagenes\/portada\.(?:jpe?g|png)$/i.test(url.trim())) {
+        const numero = Number(new URLSearchParams(location.search).get("vol")) || 1;
+        url = "imagenes/vol-" + String(numero).padStart(2, "0") + "_portada_ilustracion-01.jpeg";
+    }
     const ruta = url.trim().replace(/^\.\//, "").split("/").map((parte, i) =>
         i === 1 && /^volumen-\d+$/i.test(parte)
             ? "volumen-" + parte.match(/\d+/)[0].padStart(2, "0")
@@ -73,12 +77,19 @@ function construirIndice(v, id) {
     for (const [ck,c] of Object.entries(v.capitulos||{})) {
         if (!c || typeof c!=="object") continue;
         const imgs=[...(Array.isArray(c.imagenes)?c.imagenes:[]),...(c.imagen?[c.imagen]:[])].map(url => normalizarUrlImagen(url, id)).filter(Boolean);
+        let tituloCapitulo = textoValido(c.titulo) ? c.titulo.trim() : ck.replaceAll("_", " ");
+        // Algunos JSON antiguos guardaron el encabezado repetido del traductor
+        // como si fuera el título del capítulo. No mostrar enlaces de Facebook ni créditos.
+        if (/^Visítanos\\s+https?:\\/\\//i.test(tituloCapitulo) || /^Kikuslirus Project Team$/i.test(tituloCapitulo)) {
+            const numero = ck.match(/\\d+/);
+            tituloCapitulo = numero ? "Capítulo " + Number(numero[0]) : "Apartado";
+        }
         if (c.partes && typeof c.partes==="object") {
             for (const [pk,body] of Object.entries(c.partes)) {
-                agregarSeccion(items,{tipo:"parte",clave:ck,titulo:(c.titulo||ck)+" — "+pk.replaceAll("_"," "),parte:pk,imagenes:imgs,contenido:body});
+                agregarSeccion(items,{tipo:"parte",clave:ck,titulo:tituloCapitulo+" — "+pk.replaceAll("_"," "),parte:pk,imagenes:imgs,contenido:body});
             }
         } else if (textoValido(c.contenido)) {
-            agregarSeccion(items,{tipo:"parte",clave:ck,titulo:c.titulo||ck,parte:"",imagenes:imgs,contenido:c.contenido});
+            agregarSeccion(items,{tipo:"parte",clave:ck,titulo:tituloCapitulo,parte:"",imagenes:imgs,contenido:c.contenido});
         }
     }
     const campos=[
