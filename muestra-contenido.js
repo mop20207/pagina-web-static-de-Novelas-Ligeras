@@ -80,7 +80,7 @@ function construirIndice(v, id) {
         let tituloCapitulo = textoValido(c.titulo) ? c.titulo.trim() : ck.replaceAll("_", " ");
         // Algunos JSON antiguos guardaron el encabezado repetido del traductor
         // como si fuera el título del capítulo. No mostrar enlaces de Facebook ni créditos.
-        if (/^Visítanos\\s+https?:\\/\\//i.test(tituloCapitulo) || /^Kikuslirus Project Team$/i.test(tituloCapitulo)) {
+        if (/^Visítanos\s+https?:\/\//i.test(tituloCapitulo) || /^Kikuslirus Project Team$/i.test(tituloCapitulo)) {
             const numero = ck.match(/\\d+/);
             tituloCapitulo = numero ? "Capítulo " + Number(numero[0]) : "Apartado";
         }
