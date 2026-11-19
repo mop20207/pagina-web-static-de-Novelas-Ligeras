@@ -40,9 +40,12 @@ const VOLUMENES_EXTRA = {
 ]
 };
 
-function normalizarImagenVolumen(url, carpeta) {
+function normalizarImagenVolumen(url, carpeta, numero) {
     if (typeof url !== "string" || !url.trim()) return "";
     if (/^https?:\/\//i.test(url)) return url;
+    if (/^\.?\/?imagenes\/portada\.(?:jpe?g|png)$/i.test(url.trim()) && numero) {
+        url = "imagenes/vol-" + String(numero).padStart(2, "0") + "_portada_ilustracion-01.jpeg";
+    }
     const ruta = url.trim().replace(/^\.\//, "").split("/").map((parte, i) =>
         i === 1 && /^volumen-\d+$/i.test(parte)
             ? "volumen-" + parte.match(/\d+/)[0].padStart(2, "0")
@@ -386,7 +389,7 @@ async function cargarVolumenes(id) {
                 if (volumen.imagen) {
                     const imagen = document.createElement("img");
                     imagen.className = "imagen-volumen";
-                    imagen.src = normalizarImagenVolumen(volumen.imagen, carpeta);
+                    imagen.src = normalizarImagenVolumen(volumen.imagen, carpeta, volumen.numero);
                     imagen.alt = "Portada del volumen " + volumen.numero;
                     imagen.loading = "lazy";
                     tarjeta.append(imagen);
