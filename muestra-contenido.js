@@ -11,7 +11,7 @@ function carpetaNovela(id) { return CARPETAS_NOVELAS[id] || id; }
 function normalizarUrlImagen(url, id) {
     if (typeof url !== "string" || !url.trim()) return "";
     if (/^https?:\/\//i.test(url)) return url;
-    if (/^\.?\/?imagenes\/portada\.(?:jpe?g|png)$/i.test(url.trim())) {
+    if (id === "mushoku-tensei") {
         const numero = Number(new URLSearchParams(location.search).get("vol")) || 1;
         url = "imagenes/vol-" + String(numero).padStart(2, "0") + "_portada_ilustracion-01.jpeg";
     }
