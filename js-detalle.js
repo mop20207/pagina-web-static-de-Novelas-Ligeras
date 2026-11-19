@@ -43,7 +43,7 @@ const VOLUMENES_EXTRA = {
 function normalizarImagenVolumen(url, carpeta, numero) {
     if (typeof url !== "string" || !url.trim()) return "";
     if (/^https?:\/\//i.test(url)) return url;
-    if (/^\.?\/?imagenes\/portada\.(?:jpe?g|png)$/i.test(url.trim()) && numero) {
+    if (carpeta.toLowerCase() === "mushoku-tensei" && numero) {
         url = "imagenes/vol-" + String(numero).padStart(2, "0") + "_portada_ilustracion-01.jpeg";
     }
     const ruta = url.trim().replace(/^\.\//, "").split("/").map((parte, i) =>
